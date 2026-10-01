@@ -1,0 +1,9 @@
+구분,모델 1 (선택: C+LinReg),모델 2 (ΔQ 전용: B+LinReg),비고
+Train (Batch 1 CV),7.0,7.8,프로토콜 단위 GroupKFold(5) out-of-fold
+Valid (Batch 1 Hold-out),7.6,8.0,프로토콜 단위 Hold-out (시드 42)
+Test (Batch 2),40.8,27.7,"39셀, 최종 모델 1회 평가"
+Gap (Train-Valid),0.6,0.2,(+): 과적합 의심
+Gap (Valid-Test),33.2,19.7,(+): 배치 간 일반화 저하 의심
+Gap (Target-Test),31.7,18.6,Target: 원논문 9.1% (분할 조건이 달라 참고 지표)
+  Test: B2 일반 30셀,46.7,29.2,기존 구조 셀 (B1과 유사 구조)
+  Test: B2 newstructure 9셀,21.2,22.6,newstructure 셀

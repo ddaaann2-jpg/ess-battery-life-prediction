@@ -1,0 +1,49 @@
+{
+  "model_1": {
+    "feature_set": "C",
+    "model": "LinReg",
+    "features": [
+      "log_dq_var",
+      "qd_slope_91_100",
+      "switch",
+      "tmax_mean",
+      "dq_kurt",
+      "qd_2"
+    ],
+    "hyperparameters": "",
+    "train_cv": 7.02,
+    "valid": 7.6,
+    "test_b2": 40.84
+  },
+  "model_2_dq_only": {
+    "feature_set": "B",
+    "model": "LinReg",
+    "features": [
+      "log_dq_var",
+      "log_dq_min",
+      "log_dq_abs_mean"
+    ],
+    "hyperparameters": "",
+    "train_cv": 7.76,
+    "valid": 7.99,
+    "test_b2": 27.69
+  },
+  "label_policy": "36",
+  "n_train_cells": 36,
+  "n_train_protocols": 20,
+  "official_holdout_seed": 42,
+  "official_holdout_protocols": [
+    "4.8C(80%)-4.8C",
+    "6C(30%)-3.6C",
+    "6C(40%)-3.6C",
+    "6C(50%)-3C",
+    "6C(60%)-3C"
+  ],
+  "n_repeats": 30,
+  "selection_rule": "mean repeated protocol hold-out MAPE; simplest candidate within 1 SE of the best",
+  "best_by_mean": {
+    "feat_set": "C",
+    "model": "ElasticNet",
+    "mean": 6.78
+  }
+}
