@@ -46,9 +46,47 @@ def main():
     print('\nC 전체 표준화 계수:'); print(coef.to_string())
     # 초기 용량 배치별 평균 (B2 일반 셀은 초기 용량이 더 높은데 수명은 짧다)
     ds_v = ds[ds.valid]
+    for k, v in initial_capacity_shift().items(): print(f'  {k}: {v}')
+    print('\n외삽 플래그 구분력:'); print(flag_discrimination().to_string(index=False))
     print('\n초기 용량 qd_2 평균:', ds_v.groupby('batch').qd_2.mean().round(3).to_dict(),
           '| B2 일반:', round(ds_v[(ds_v.batch == 'batch2') & (ds_v.b2_group == 'general')].qd_2.mean(), 3),
           '| B1 학습 풀(36셀):', round(pool.qd_2.mean(), 3))
+
+
+def initial_capacity_shift():
+    """초기 용량의 배치 간 분포 이동이 B2 오차를 만드는지 확인 (사후 분석, 해석용)."""
+    ds = build_dataset(); pool = training_pool(ds, '36'); test = test_set(ds)
+    gen = test[test.b2_group == 'general']
+    mu, sd, mx = pool.qd_2.mean(), pool.qd_2.std(), pool.qd_2.max()
+    out = {'B1 학습 풀 초기 용량 평균': round(mu, 3), 'B1 표준편차': round(sd, 4), 'B2 일반 평균': round(gen.qd_2.mean(), 3),
+           'B2 일반 평균의 z(B1 기준)': round((gen.qd_2.mean() - mu) / sd, 2), 'B1 최댓값': round(mx, 3),
+           'B2 일반 중 B1 최댓값 초과': f'{int((gen.qd_2 > mx).sum())}/{len(gen)}'}
+    # A + 초기 용량 모델: B2 일반 셀의 초기 용량만 B1 평균으로 바꿔 예측
+    cols = ['log_dq_var', 'qd_2']
+    m, _ = fit_model('LinReg', pool[cols], pool.y, pool.protocol.values)
+    g = gen.copy()
+    out['A+초기용량, B2 일반 MAPE (실제 입력)'] = round(mape(g.y, m.predict(g[cols])), 1)
+    g['qd_2'] = mu
+    out['A+초기용량, B2 일반 MAPE (초기용량을 B1 평균으로)'] = round(mape(g.y, m.predict(g[cols])), 1)
+    # B1 안에서 초기 용량-수명 상관: 단순 vs ΔQ 분산을 통제한 편상관
+    r_simple = np.corrcoef(pool.qd_2, pool.y)[0, 1]
+    res = lambda v: v - np.polyval(np.polyfit(pool.log_dq_var, v, 1), pool.log_dq_var)
+    out['B1 초기용량-log수명 상관(단순)'] = round(r_simple, 2)
+    out['B1 초기용량-log수명 편상관(Var[ΔQ] 통제)'] = round(np.corrcoef(res(pool.qd_2), res(pool.y))[0, 1], 2)
+    pd.Series(out).to_csv(R('initial_capacity_shift.csv'), header=['값'])
+    return out
+
+
+def flag_discrimination():
+    """외삽 플래그(피처 하나라도 학습 범위 밖)가 켜진 셀과 꺼진 셀의 오차 비교 (error_analysis_b2.csv 사용)."""
+    e = pd.read_csv(R('error_analysis_b2.csv')); rows = []
+    for tag, nm in (('m1', '모델 1'), ('m2', '모델 2')):
+        for scope, d in (('전체 39셀', e), ('일반 30셀', e[e.b2_group == 'general'])):
+            for flag in (True, False):
+                x = d[d[f'extrapolation_{tag}'] == flag]
+                rows.append(dict(모델=nm, 범위=scope, 플래그='켜짐' if flag else '꺼짐', 셀수=len(x),
+                                 MAPE=round(x[f'abs_pct_err_{tag}'].mean(), 1) if len(x) else None))
+    out = pd.DataFrame(rows); out.to_csv(R('extrapolation_flag_check.csv'), index=False); return out
 
 
 if __name__ == '__main__':
