@@ -2,8 +2,8 @@
  - 원 라벨 41셀 / 36셀(하한값 가능 0~4번 제외) / 논문 코드 add_len 보정 41셀
  add_len 은 논문 공식 저장소(rdbraatz/data-driven-prediction-of-battery-cycle-life-before-capacity-degradation)의 상수이며,
  이어진 기록 자체는 이 데이터에 없다. 이어붙는 사이클 수 = 662/981/1060/208/482 (= add_len + 1).
- 출처: MATLAB LoadData.m 의 add_len=[661, 980, 1059, 207, 481] 에 end+add_len(i)+1 이 더해진다.
- Load Data.ipynb 의 [662, 981, 1060, 208, 482] 는 원문 전체를 직접 열어 보지는 않았다. LoadData.m 과 일치하는 값이다.
+ 출처: 공식 저장소 LoadData.m 을 직접 열어 확인했다 (19행 add_len=[661, 980, 1059, 207, 481], 24행 end+add_len(i)+1 로 이어붙임,
+ 71행 제외 목록 [9,11,13,14,23] = 0-index 8,10,12,13,22). Load Data.ipynb 원문은 열어 보지 않았다.
 실행: python -m src.analysis.label_sensitivity  -> results/eda/label_sensitivity.csv
 """
 import numpy as np, pandas as pd
