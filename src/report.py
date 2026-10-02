@@ -101,7 +101,7 @@ def fig_worst_dq(err=None):
     ax[0].fill_between(Vd, np.nanmin(dq1, 0), np.nanmax(dq1, 0), color='#bee3f8', alpha=.6, label='B1 학습 풀 범위(min–max)')
     for i, row in worst.iterrows(): ax[0].plot(Vd, dq2[int(row.cell_id)], color='#c53030', lw=1, alpha=.85, label='B2 일반: 오차 큰 5개' if i == worst.index[0] else None)
     for i, row in best.iterrows(): ax[0].plot(Vd, dq2[int(row.cell_id)], color='#2f855a', lw=1, alpha=.85, label='B2 일반: 오차 작은 5개' if i == best.index[0] else None)
-    ax[0].axhline(0, color='k', lw=.5); ax[0].set_xlabel('전압 V'); ax[0].set_ylabel('ΔQ(V) = Q100 − Q10 (Ah)'); ax[0].legend(fontsize=8.5, loc='lower left')
+    ax[0].axhline(0, color='k', lw=.5); ax[0].set_xlabel('전압 V'); ax[0].set_ylabel('ΔQ(V) = Q100 - Q10 (Ah)'); ax[0].legend(fontsize=8.5, loc='lower left')
     ax[0].set_title('ΔQ(V) 곡선 형태: 오차 큰 셀 vs 작은 셀', fontsize=10.5)
     lo, hi = pool.qd_2.min(), pool.qd_2.max()
     ax[1].axvspan(lo, hi, color='#bee3f8', alpha=.5, label='B1 학습 범위(초기 용량)')

@@ -134,7 +134,7 @@ def run(n_repeats=N_REPEATS):
         err[f'n_feat_out_{tag}'] = ((test[m['cols']] < lo) | (test[m['cols']] > hi)).sum(axis=1).values
         err[f'extrapolation_{tag}'] = extrapolation_flag(pool[m['cols']], test[m['cols']])    # 피처 하나라도 학습 범위 밖이면 True
     err['var_out_of_range'] = ((test.log_dq_var < pool.log_dq_var.min()) | (test.log_dq_var > pool.log_dq_var.max())).values
-    err.round(2).to_csv(R('error_analysis_b2.csv'), index=False)
+    err.round(4).to_csv(R('error_analysis_b2.csv'), index=False)
 
     # (참고) 모든 후보의 B2 성능 -- 선택에 사용하지 않았다
     def _ref(fs_, m_):
