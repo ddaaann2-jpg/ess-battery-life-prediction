@@ -1,0 +1,13 @@
+policy,b2_group,셀수,평균수명,M1_MAPE,M2_MAPE
+6C(60%)-3C,general,2,400.0,86.4,40.9
+3.6C(9%)-5C,general,2,394.5,77.4,51.0
+5.2C(50%)-4.25C,general,5,454.0,52.6,36.9
+5.2C(58%)-4C,general,4,477.8,48.1,28.9
+4.8C(80%)-4.8C,general,5,483.6,47.8,33.2
+5.6C(26%)-4.5C,general,6,448.5,40.6,22.3
+4.65C(44%)-5C,general,2,482.5,27.7,6.3
+4.8C(80%)-4.8C-newstructure,newstructure,3,871.7,23.7,26.3
+5.2C(58%)-4C-newstructure,newstructure,3,961.7,23.5,21.3
+3.6C(30%)-6C,general,2,421.0,20.7,17.9
+4.65C(69%)-6C,general,2,452.0,19.6,22.5
+5.6C(26%)-4.5C-newstructure,newstructure,3,991.3,16.4,20.1

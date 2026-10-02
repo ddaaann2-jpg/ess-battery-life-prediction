@@ -86,6 +86,32 @@ def fig_error_vs_var(err=None, pool=None):
     return _save(fig, 'm4_b2_error_vs_feature.png')
 
 
+def fig_worst_dq(err=None):
+    """오류 분석: (왼쪽) B2 일반 셀 중 오차가 가장 큰/작은 5개의 ΔQ(V) 곡선 형태를 B1 학습 풀 범위와 비교,
+    (오른쪽) 셀별 부호 있는 오차 vs 초기 용량 (B1 학습 범위 표시)."""
+    from src.data import load_all, test_set
+    from src.features import delta_q
+    err = err if err is not None else pd.read_csv(R('error_analysis_b2.csv'))
+    data = load_all(); ds = build_dataset(); pool = training_pool(ds, '36')
+    Vd = data['batch1']['Vdlin']
+    dq1 = delta_q(data['batch1']['Qdlin'])[pool.cell_id.values]; dq2 = delta_q(data['batch2']['Qdlin'])
+    gen = err[err.b2_group == 'general'].sort_values('abs_pct_err_m1')
+    best, worst = gen.head(5), gen.tail(5)
+    fig, ax = plt.subplots(1, 2, figsize=(12, 4.4))
+    ax[0].fill_between(Vd, np.nanmin(dq1, 0), np.nanmax(dq1, 0), color='#bee3f8', alpha=.6, label='B1 학습 풀 범위(min–max)')
+    for i, row in worst.iterrows(): ax[0].plot(Vd, dq2[int(row.cell_id)], color='#c53030', lw=1, alpha=.85, label='B2 일반: 오차 큰 5개' if i == worst.index[0] else None)
+    for i, row in best.iterrows(): ax[0].plot(Vd, dq2[int(row.cell_id)], color='#2f855a', lw=1, alpha=.85, label='B2 일반: 오차 작은 5개' if i == best.index[0] else None)
+    ax[0].axhline(0, color='k', lw=.5); ax[0].set_xlabel('전압 V'); ax[0].set_ylabel('ΔQ(V) = Q100 − Q10 (Ah)'); ax[0].legend(fontsize=8.5, loc='lower left')
+    ax[0].set_title('ΔQ(V) 곡선 형태: 오차 큰 셀 vs 작은 셀', fontsize=10.5)
+    lo, hi = pool.qd_2.min(), pool.qd_2.max()
+    ax[1].axvspan(lo, hi, color='#bee3f8', alpha=.5, label='B1 학습 범위(초기 용량)')
+    for grp, col in (('general', C_GEN), ('newstructure', C_NEW)):
+        d = err[err.b2_group == grp]; ax[1].scatter(d.qd_2, d.signed_pct_err_m1, s=26, color=col, alpha=.85, label=grp)
+    ax[1].axhline(0, color='k', lw=.8); ax[1].set_xlabel('초기 용량 QD(2) (Ah)'); ax[1].set_ylabel('모델 1 부호 있는 오차 (%)')
+    ax[1].legend(fontsize=8.5, loc='upper left'); ax[1].set_title('셀별 오차 vs 초기 용량', fontsize=10.5)
+    return _save(fig, 'm5_worst_cells_dq_and_capacity.png')
+
+
 def error_summary(err=None):
     """오류 분석 요약표: 집단/범위 이탈/수명 구간별 MAPE·편향 (모델 1·2)."""
     err = err if err is not None else pd.read_csv(R('error_analysis_b2.csv'))
@@ -102,5 +128,5 @@ def error_summary(err=None):
 
 
 if __name__ == '__main__':
-    for f in (fig_split, fig_candidates, fig_pred_vs_true, fig_error_vs_var): print(f())
+    for f in (fig_split, fig_candidates, fig_pred_vs_true, fig_error_vs_var, fig_worst_dq): print(f())
     print(error_summary().to_string(index=False))
