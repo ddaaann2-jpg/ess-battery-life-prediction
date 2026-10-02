@@ -132,6 +132,7 @@ def run(n_repeats=N_REPEATS):
         err[f'signed_pct_err_{tag}'] = (err[f'pred_{tag}'] - err.cycle_life) / err.cycle_life * 100
         lo, hi = pool[m['cols']].min(), pool[m['cols']].max()
         err[f'n_feat_out_{tag}'] = ((test[m['cols']] < lo) | (test[m['cols']] > hi)).sum(axis=1).values
+        err[f'extrapolation_{tag}'] = extrapolation_flag(pool[m['cols']], test[m['cols']])    # 피처 하나라도 학습 범위 밖이면 True
     err['var_out_of_range'] = ((test.log_dq_var < pool.log_dq_var.min()) | (test.log_dq_var > pool.log_dq_var.max())).values
     err.round(2).to_csv(R('error_analysis_b2.csv'), index=False)
 
